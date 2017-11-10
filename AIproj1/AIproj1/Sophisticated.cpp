@@ -23,9 +23,10 @@ int HighestFit, leastFitIndex, HighestFitIndex;
 int populationSize = 100;
 int  *order, *population, *bestEver;
 int **citycopy, **city, **newPopulation;
-float *fitness, *dist;
+float *fitness,*dist;
 float *minFitValue, *maxFitValue;
 int funct;
+int finaldist;
 int maxBound1;
 //std::vector<int> city;
 std::map<float, int*> m;
@@ -62,16 +63,17 @@ char* Sophisticated::GeneticAlgorithm(int numOfCities, int costFunctionValue, in
 	CalcualteFitnessProbabilities(numCity);
 
 	//10 Generations
-	for (int r = 0; r < 10; r++) {
+	for (int r = 0; r < 1; r++) {
 		newGeneration(citycopy, fitness,numCity);
 		CalcualteFitnessProbabilities(numCity);
 	}
+	finaldist = dist[HighestFitIndex];
 	std::string path="";
 	for (int i = 0; i < numCity; i++) {
-		path=path+std::to_string(citycopy[HighestFit][i])+"->";
+		path=path+std::to_string(citycopy[HighestFitIndex][i])+"->";
 	}
 	std::string output = "";
-	std::string dist = std::to_string(dist[HighestFit]);
+	std::string dist = std::to_string(finaldist);
 	output = output + "ShortestDistace:" + dist + "\n";
 	output = output + "Path:" + path;
 	output = output + "\n" + "Time taken in Seconds:";
@@ -106,7 +108,7 @@ void generate(int numCity,int costfunc)
 }
 //shuffle for intital population of 200
 int* shuffle(int order[], int numCity) {
-	std::random_shuffle(&order[0], &order[10]);
+	std::random_shuffle(&order[0], &order[numCity]);
 	population = new int[numCity];
 	for (int i = 0; i < numCity; i++) {
 		population[i] = order[i];
@@ -120,7 +122,7 @@ int* shuffle(int order[], int numCity) {
 float cal_Dist(int city1[], int numCity) {
 	float d = 0;
 
-	for (int i = 0; i <numCity - 1; i++) {
+	for (int i = 0; i <numCity-1; i++) {
 
 		d = d + cities_distances[city1[i]][city1[i + 1]];
 	}
@@ -132,11 +134,11 @@ void CalcualteFitnessProbabilities(int numCity) {
 	for (int i = 0; i < populationSize; i++) {
 		distance = cal_Dist(citycopy[i], numCity);
 		dist[i] = distance;
-		if (distance < recordDistance && distance!=0) {
+		/*if (distance < recordDistance && distance!=0) {
 			recordDistance = distance;
 			HighestFit = i;
-		}
-		fitness[i] = 1 / (distance + 1);
+		}*/
+		fitness[i] = 1 / (distance);
 	}
 
 	for (int i = 0; i < populationSize; i++) {
@@ -168,9 +170,9 @@ void newGeneration(int *citycopy[], float fitness[],int numCity) {
 	for (int i = 0; i < populationSize; i++) {
 		city[i] = new int[numCity];
 		int RandomParent = rand() % populationSize;
-		city[i]=crossOver(citycopy[HighestFit], citycopy[RandomParent],i,numCity);
-		//city[i] = crossOver(citycopy[HighestFit], citycopy[leastFitIndex], i,numCity);
-		//citycopy[leastFitIndex] = city[i];
+		city[i]=crossOver(citycopy[HighestFitIndex], citycopy[RandomParent],i,numCity);
+		//city[i] = crossOver(citycopy[HighestFitIndex], citycopy[leastFitIndex], i,numCity);
+		
 
 	}
 	for (int i = 0; i < populationSize; i++) {
@@ -238,14 +240,14 @@ bool containsCity(int pos, int loc, int numCity) {
 }
 
 void mutate(int citycopy[], float mutationRate,int numCity) {
-	for (int i = 0; i < numCity; i++) {
+	//for (int k = 0; k < numCity; k++) {
 		if (rand() / (RAND_MAX)<mutationRate) {
-			int indexA = floor(rand() % numCity);
-			int indexB = floor(rand() % numCity);
-			swap(citycopy, indexA, indexB);
+			int posA = floor(rand() % numCity);
+			int posB = floor(rand() % numCity);
+			swap(citycopy, posA, posB);
 		}
 
-	}
+	//}
 
 
 }
